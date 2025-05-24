@@ -1,0 +1,163 @@
+{
+    "last_updated": "2025-05-24T06:00:08Z",
+    "equipment": [
+        {
+            "serial_number": "VCUA-10234",
+            "type": "VCU Type A",
+            "name": "Portable Video Conferencing Unit - Type A",
+            "id": "E001"
+        },
+        {
+            "serial_number": "VCUB-20344",
+            "type": "VCU Type B",
+            "name": "Portable Video Conferencing Unit - Type B",
+            "id": "E002"
+        },
+        {
+            "serial_number": "SB-45689",
+            "type": "Smartboard",
+            "name": "Portable Smartboard 1",
+            "id": "E003"
+        },
+        {
+            "serial_number": "SB-67890",
+            "type": "Smartboard",
+            "name": "Portable Smartboard 2",
+            "id": "E004"
+        },
+        {
+            "serial_number": "VRX-99123",
+            "type": "VR/AR Testing Kit",
+            "name": "VR Headset 1",
+            "id": "E005"
+        },
+        {
+            "serial_number": "VRX-56327",
+            "type": "VR/AR Testing Kit",
+            "name": "VR Headset 2",
+            "id": "E006"
+        },
+        {
+            "serial_number": "PJP-12345",
+            "type": "Portable Projector",
+            "name": "Portable Projector 1",
+            "id": "E007"
+        },
+        {
+            "serial_number": "DTB-55987",
+            "type": "Digital Drawing Tablet",
+            "name": "Digital Drawing Tablet 1",
+            "id": "E008"
+        },
+        {
+            "serial_number": "WPC-78901",
+            "type": "Wireless Presentation Clicker",
+            "name": "Wireless Presentation Clicker 1",
+            "id": "E009"
+        },
+        {
+            "serial_number": "PM-11234",
+            "type": "Portable Monitor",
+            "name": "Portable Monitor 1",
+            "id": "E010"
+        },
+        {
+            "serial_number": "IPD-43221",
+            "type": "Tablet",
+            "name": "iPad Pro 12.9\" 2024",
+            "id": "E011"
+        },
+        {
+            "serial_number": "IP-78456",
+            "type": "Smartphone",
+            "name": "iPhone 14 Pro",
+            "id": "E012"
+        },
+        {
+            "serial_number": "AND-23456",
+            "type": "Smartphone",
+            "name": "Android Phone - Samsung Galaxy S23",
+            "id": "E013"
+        },
+        {
+            "serial_number": "ANDT-76543",
+            "type": "Tablet",
+            "name": "Android Tablet - Samsung Tab S8",
+            "id": "E014"
+        }
+    ],
+    "rooms": [
+        {
+            "amenities": [
+                "Noise-Canceling Headset"
+            ],
+            "capacity": 1,
+            "name": "Soundproof Focus Pod 1",
+            "id": "R101"
+        },
+        {
+            "amenities": [
+                "Noise-Canceling Headset"
+            ],
+            "capacity": 1,
+            "name": "Soundproof Focus Pod 2",
+            "id": "R102"
+        },
+        {
+            "amenities": [
+                "Whiteboard",
+                "Portable Projector"
+            ],
+            "capacity": 4,
+            "name": "Huddle Room 1",
+            "id": "R201"
+        },
+        {
+            "amenities": [
+                "Whiteboard"
+            ],
+            "capacity": 4,
+            "name": "Huddle Room 2",
+            "id": "R202"
+        },
+        {
+            "amenities": [
+                "Smartboard",
+                "VCU Type B",
+                "Wireless Presentation Clicker"
+            ],
+            "capacity": 8,
+            "name": "Collaboration Room A",
+            "id": "R301"
+        },
+        {
+            "amenities": [
+                "Smartboard",
+                "VCU Type A"
+            ],
+            "capacity": 8,
+            "name": "Collaboration Room B",
+            "id": "R302"
+        },
+        {
+            "amenities": [
+                "VCU Type A",
+                "Smartboard",
+                "Portable Projector"
+            ],
+            "capacity": 16,
+            "name": "Boardroom A",
+            "id": "R401"
+        },
+        {
+            "amenities": [
+                "VCU Type A",
+                "Wireless Presentation Clicker",
+                "Soundproofing"
+            ],
+            "capacity": 20,
+            "name": "Boardroom B",
+            "id": "R402"
+        }
+    ]
+}
