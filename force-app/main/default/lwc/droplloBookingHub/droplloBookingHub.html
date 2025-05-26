@@ -1,0 +1,405 @@
+<template>
+    <lightning-card title="Dropillo Space & Asset Hub" icon-name="utility:date_time" class="main-container">
+        
+        <!-- Navigation Tabs -->
+        <div class="slds-tabs_default tab-navigation">
+            <ul class="slds-tabs_default__nav" role="tablist">
+                <li class="slds-tabs_default__item" role="presentation">
+                    <a class="slds-tabs_default__link" href="#" role="tab" 
+                       data-tab="rooms" onclick={handleTabChange}
+                       aria-selected={isRoomsTabActive}>
+                        <lightning-icon icon-name="utility:home" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        Rooms
+                    </a>
+                </li>
+                <li class="slds-tabs_default__item" role="presentation">
+                    <a class="slds-tabs_default__link" href="#" role="tab" 
+                       data-tab="equipment" onclick={handleTabChange}
+                       aria-selected={isEquipmentTabActive}>
+                        <lightning-icon icon-name="utility:connected_apps" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        Equipment
+                    </a>
+                </li>
+                <li class="slds-tabs_default__item" role="presentation">
+                    <a class="slds-tabs_default__link" href="#" role="tab" 
+                       data-tab="mybookings" onclick={handleTabChange}
+                       aria-selected={isMyBookingsTabActive}>
+                        <lightning-icon icon-name="utility:event" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        All My Bookings
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="slds-tabs_default__content tab-content-section">
+                
+                <!-- Rooms Tab -->
+                <div if:true={isRoomsTabActive} class="slds-p-around_medium rooms-tab-content">
+                    <div class="slds-grid slds-gutters slds-wrap">
+                        
+                        <!-- Filters Section -->
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                            <lightning-card title="Filter Rooms" class="slds-m-bottom_medium filter-section">
+                                <div class="slds-p-around_medium">
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="roomStartTime" 
+                                        label="Start Time" 
+                                        value={roomStartTime}
+                                        onchange={handleRoomFilterChange}
+                                        required>
+                                    </lightning-input>
+                                    
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="roomEndTime" 
+                                        label="End Time" 
+                                        value={roomEndTime}
+                                        onchange={handleRoomFilterChange}
+                                        required
+                                        class="slds-m-top_small">
+                                    </lightning-input>
+                                    
+                                    <lightning-input 
+                                        type="number" 
+                                        name="capacity" 
+                                        label="Minimum Capacity" 
+                                        value={roomCapacity}
+                                        onchange={handleRoomFilterChange}
+                                        min="1"
+                                        class="slds-m-top_small">
+                                    </lightning-input>
+                                    
+                                    <lightning-input 
+                                        type="text" 
+                                        name="amenities" 
+                                        label="Required Amenities (comma-separated)" 
+                                        value={roomAmenities}
+                                        onchange={handleRoomFilterChange}
+                                        placeholder="e.g., Whiteboard, Projector"
+                                        class="slds-m-top_small">
+                                    </lightning-input>
+                                    
+                                    <lightning-button 
+                                        label="Search Rooms" 
+                                        variant="brand" 
+                                        onclick={searchRooms}
+                                        disabled={isSearchingRooms}
+                                        class="slds-m-top_medium slds-align_absolute-center">
+                                    </lightning-button>
+                                </div>
+                            </lightning-card>
+                        </div>
+                        
+                        <!-- Rooms List -->
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-3">
+                            <lightning-card title="Available Rooms" class="results-section">
+                                <div class="slds-p-around_medium">
+                                    <div if:true={isSearchingRooms} class="slds-align_absolute-center">
+                                        <lightning-spinner alternative-text="Searching rooms..." size="medium"></lightning-spinner>
+                                    </div>
+                                    
+                                    <div if:false={isSearchingRooms}>
+                                        <div if:true={hasRooms} class="slds-grid slds-wrap slds-gutters_small">
+                                            <template for:each={availableRooms} for:item="room">
+                                                <div key={room.roomId} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                    <div class={room.cardClass}>
+                                                        <div class="slds-card__header slds-grid">
+                                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                                <div class="slds-media__figure">
+                                                                    <lightning-icon icon-name="utility:home" size="small"></lightning-icon>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <h2 class="slds-card__header-title">
+                                                                        <span class="slds-text-heading_small">{room.name}</span>
+                                                                    </h2>
+                                                                </div>
+                                                            </header>
+                                                            <div class="slds-no-flex">
+                                                                <lightning-badge label={room.availabilityLabel} 
+                                                                               variant={room.availabilityVariant}>
+                                                                </lightning-badge>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-card__body slds-card__body_inner">
+                                                            <p><strong>Type:</strong> {room.roomType}</p>
+                                                            <p><strong>Capacity:</strong> {room.capacity}</p>
+                                                            <p><strong>Floor:</strong> {room.floor}</p>
+                                                            <div if:true={room.amenities}>
+                                                                <p><strong>Amenities:</strong></p>
+                                                                <div class="slds-m-top_x-small">
+                                                                    <template for:each={room.amenities} for:item="amenity">
+                                                                        <lightning-pill key={amenity} label={amenity} class="slds-m-right_x-small slds-m-bottom_x-small">
+                                                                        </lightning-pill>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-card__footer">
+                                                            <lightning-button 
+                                                                label="Book Room" 
+                                                                variant="brand" 
+                                                                disabled={room.isDisabled}
+                                                                data-room-id={room.roomId}
+                                                                onclick={handleBookRoom}
+                                                                class="slds-size_1-of-1">
+                                                            </lightning-button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        
+                                        <div if:false={hasRooms} class="slds-align_absolute-center">
+                                            <lightning-icon icon-name="utility:info" size="medium" class="slds-m-right_small"></lightning-icon>
+                                            <span class="slds-text-body_regular">No rooms found. Please adjust your search criteria.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </lightning-card>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Equipment Tab -->
+                <div if:true={isEquipmentTabActive} class="slds-p-around_medium equipment-tab-content">
+                    <div class="slds-grid slds-gutters slds-wrap">
+                        
+                        <!-- Equipment Filters -->
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                            <lightning-card title="Filter Equipment" class="slds-m-bottom_medium filter-section">
+                                <div class="slds-p-around_medium">
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="equipmentStartTime" 
+                                        label="Start Time" 
+                                        value={equipmentStartTime}
+                                        onchange={handleEquipmentFilterChange}
+                                        required>
+                                    </lightning-input>
+                                    
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="equipmentEndTime" 
+                                        label="End Time" 
+                                        value={equipmentEndTime}
+                                        onchange={handleEquipmentFilterChange}
+                                        required
+                                        class="slds-m-top_small">
+                                    </lightning-input>
+                                    
+                                    <lightning-combobox 
+                                        name="equipmentType" 
+                                        label="Equipment Type" 
+                                        value={equipmentType}
+                                        options={equipmentTypeOptions}
+                                        onchange={handleEquipmentFilterChange}
+                                        placeholder="All Types"
+                                        class="slds-m-top_small">
+                                    </lightning-combobox>
+                                    
+                                    <lightning-button 
+                                        label="Search Equipment" 
+                                        variant="brand" 
+                                        onclick={searchEquipment}
+                                        disabled={isSearchingEquipment}
+                                        class="slds-m-top_medium slds-align_absolute-center">
+                                    </lightning-button>
+                                </div>
+                            </lightning-card>
+                        </div>
+                        
+                        <!-- Equipment List -->
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-3">
+                            <lightning-card title="Available Equipment" class="results-section">
+                                <div class="slds-p-around_medium">
+                                    <div if:true={isSearchingEquipment} class="slds-align_absolute-center">
+                                        <lightning-spinner alternative-text="Searching equipment..." size="medium"></lightning-spinner>
+                                    </div>
+                                    
+                                    <div if:false={isSearchingEquipment}>
+                                        <div if:true={hasEquipment} class="slds-grid slds-wrap slds-gutters_small">
+                                            <template for:each={availableEquipment} for:item="equipment">
+                                                <div key={equipment.equipmentId} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                    <div class={equipment.cardClass}>
+                                                        <div class="slds-card__header slds-grid">
+                                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                                <div class="slds-media__figure">
+                                                                    <lightning-icon icon-name="utility:connected_apps" size="small"></lightning-icon>
+                                                                </div>
+                                                                <div class="slds-media__body">
+                                                                    <h2 class="slds-card__header-title">
+                                                                        <span class="slds-text-heading_small">{equipment.name}</span>
+                                                                    </h2>
+                                                                </div>
+                                                            </header>
+                                                            <div class="slds-no-flex">
+                                                                <lightning-badge label={equipment.availabilityLabel} 
+                                                                               variant={equipment.availabilityVariant}>
+                                                                </lightning-badge>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-card__body slds-card__body_inner">
+                                                            <p><strong>Type:</strong> {equipment.equipmentType}</p>
+                                                            <p><strong>Serial:</strong> {equipment.serialNumber}</p>
+                                                            <p if:true={equipment.currentLocation}><strong>Location:</strong> {equipment.currentLocation}</p>
+                                                        </div>
+                                                        <div class="slds-card__footer">
+                                                            <lightning-button 
+                                                                label="Book Equipment" 
+                                                                variant="brand" 
+                                                                disabled={equipment.isDisabled}
+                                                                data-equipment-id={equipment.equipmentId}
+                                                                onclick={handleBookEquipment}
+                                                                class="slds-size_1-of-1">
+                                                            </lightning-button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        
+                                        <div if:false={hasEquipment} class="slds-align_absolute-center">
+                                            <lightning-icon icon-name="utility:info" size="medium" class="slds-m-right_small"></lightning-icon>
+                                            <span class="slds-text-body_regular">No equipment found. Please adjust your search criteria.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </lightning-card>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Bookings Tab -->
+                <div if:true={isMyBookingsTabActive} class="slds-p-around_medium bookings-tab-content">
+                    <lightning-card title="All My Bookings" class="results-section">
+                        <div class="slds-p-around_medium">
+                            <div if:true={isLoadingBookings} class="slds-align_absolute-center">
+                                <lightning-spinner alternative-text="Loading bookings..." size="medium"></lightning-spinner>
+                            </div>
+                            
+                            <div if:false={isLoadingBookings}>
+                                <div if:true={hasBookings}>
+                                    <div class="slds-grid slds-wrap slds-gutters_small">
+                                        <template for:each={userBookings} for:item="booking">
+                                            <div key={booking.bookingId} class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 booking-card-container">
+                                                <div class={booking.cardClass}>
+                                                    <div class="slds-card__header slds-grid">
+                                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                            <div class="slds-media__figure">
+                                                                <lightning-icon icon-name={booking.iconName} size="small"></lightning-icon>
+                                                            </div>
+                                                            <div class="slds-media__body">
+                                                                <h2 class="slds-card__header-title">
+                                                                    <span class="slds-text-heading_small">{booking.resourceName}</span>
+                                                                </h2>
+                                                            </div>
+                                                        </header>
+                                                        <div class="slds-no-flex">
+                                                            <lightning-badge label={booking.status} variant={booking.statusVariant}></lightning-badge>
+                                                            <template if:true={booking.isExpired}>
+                                                                <lightning-badge label="Past" variant="warning" class="slds-m-left_x-small"></lightning-badge>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-card__body slds-card__body_inner">
+                                                        <p><strong>Booking:</strong> {booking.bookingNumber}</p>
+                                                        <p><strong>Type:</strong> {booking.bookingType}</p>
+                                                        <p><strong>Start:</strong> {booking.formattedStartTime}</p>
+                                                        <p><strong>End:</strong> {booking.formattedEndTime}</p>
+                                                        <p if:true={booking.location}><strong>Location:</strong> {booking.location}</p>
+                                                        <p if:true={booking.purpose}><strong>Purpose:</strong> {booking.purpose}</p>
+                                                        <p if:true={booking.attendeeCount}><strong>Attendees:</strong> {booking.attendeeCount}</p>
+                                                    </div>
+                                                    <div class="slds-card__footer">
+                                                        <lightning-button 
+                                                            label="Cancel Booking" 
+                                                            variant="destructive" 
+                                                            disabled={booking.isCancelDisabled}
+                                                            data-booking-id={booking.bookingId}
+                                                            onclick={handleCancelBooking}
+                                                            class="slds-size_1-of-1">
+                                                        </lightning-button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                
+                                <div if:false={hasBookings} class="slds-align_absolute-center">
+                                    <lightning-icon icon-name="utility:info" size="medium" class="slds-m-right_small"></lightning-icon>
+                                    <span class="slds-text-body_regular">You have no bookings.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Modal -->
+        <template if:true={showBookingModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeBookingModal}>
+                            <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium modal-content-spacing">
+                        <lightning-record-edit-form object-api-name="Booking__c" onsuccess={handleBookingSuccess} onerror={handleBookingError}>
+                            <div class="slds-grid slds-gutters slds-wrap">
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="startDateTime" 
+                                        label="Start Date & Time" 
+                                        value={modalStartTime}
+                                        onchange={handleModalFieldChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning-input 
+                                        type="datetime-local" 
+                                        name="endDateTime" 
+                                        label="End Date & Time" 
+                                        value={modalEndTime}
+                                        onchange={handleModalFieldChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning-textarea 
+                                        name="purpose" 
+                                        label="Purpose" 
+                                        value={modalPurpose}
+                                        onchange={handleModalFieldChange}
+                                        placeholder="Brief description of booking purpose...">
+                                    </lightning-textarea>
+                                </div>
+                                <div if:true={isRoomBooking} class="slds-col slds-size_1-of-1">
+                                    <lightning-input 
+                                        type="number" 
+                                        name="attendeeCount" 
+                                        label="Number of Attendees" 
+                                        value={modalAttendeeCount}
+                                        onchange={handleModalFieldChange}
+                                        min="1">
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="neutral" label="Cancel" onclick={closeBookingModal}></lightning-button>
+                        <lightning-button variant="brand" label="Create Booking" onclick={createBooking} disabled={isCreatingBooking}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </lightning-card>
+</template> 

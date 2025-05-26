@@ -1,0 +1,324 @@
+/* Custom styles for Dropillo Booking Hub */
+
+.slds-tabs_default__nav {
+    border-bottom: 2px solid #e5e5e5;
+}
+
+.slds-tabs_default__link {
+    color: #3e3e3c;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.slds-tabs_default__link:hover {
+    color: #1589ee;
+    background-color: #f8f9fa;
+}
+
+.slds-tabs_default__link[aria-selected="true"] {
+    color: #1589ee;
+    border-bottom: 3px solid #1589ee;
+    background-color: #ffffff;
+}
+
+/* Card animations */
+.slds-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e5e5e5;
+}
+
+.slds-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.slds-card_disabled {
+    opacity: 0.6;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Availability badges */
+.slds-badge {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Room and equipment cards */
+.slds-card__header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.slds-card__body {
+    padding: 1rem;
+}
+
+.slds-card__footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e5e5e5;
+    padding: 0.75rem 1rem;
+}
+
+/* Pills for amenities */
+.slds-pill {
+    background-color: #ecebea;
+    border: 1px solid #c9c7c5;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Modal enhancements */
+.slds-modal__container {
+    max-width: 600px;
+}
+
+.slds-modal__header {
+    background: linear-gradient(135deg, #1589ee 0%, #0070d2 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.slds-modal__header h2 {
+    color: white;
+    font-weight: 600;
+}
+
+.slds-modal__close {
+    color: white;
+}
+
+.slds-modal__content {
+    background-color: #fafafa;
+}
+
+.slds-modal__footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Filter sections */
+.slds-card[title="Filter Rooms"], 
+.slds-card[title="Filter Equipment"] {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e5e5e5;
+}
+
+/* Button enhancements */
+.slds-button_brand {
+    background: linear-gradient(135deg, #1589ee 0%, #0070d2 100%);
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.slds-button_brand:hover {
+    background: linear-gradient(135deg, #0070d2 0%, #005fb2 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(21, 137, 238, 0.3);
+}
+
+.slds-button_destructive {
+    transition: all 0.2s ease;
+}
+
+.slds-button_destructive:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(194, 57, 52, 0.3);
+}
+
+/* Spinner container */
+.slds-spinner_container {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .slds-grid.slds-gutters {
+        margin: 0 -0.5rem;
+    }
+    
+    .slds-col {
+        padding: 0 0.5rem;
+    }
+    
+    .slds-card__body {
+        padding: 0.75rem;
+    }
+    
+    .slds-modal__container {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
+}
+
+/* Status variants for bookings */
+.status-confirmed {
+    background-color: #4bca81;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffb75d;
+    color: white;
+}
+
+.status-in-use {
+    background-color: #1589ee;
+    color: white;
+}
+
+.status-completed {
+    background-color: #706e6b;
+    color: white;
+}
+
+.status-cancelled {
+    background-color: #ea001e;
+    color: white;
+}
+
+/* Loading states */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+/* Search results */
+.search-results-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #706e6b;
+    font-style: italic;
+}
+
+/* Form enhancements */
+.slds-form-element__label {
+    font-weight: 600;
+    color: #3e3e3c;
+}
+
+.slds-input, .slds-textarea, .slds-combobox__input {
+    border: 2px solid #e5e5e5;
+    border-radius: 4px;
+    transition: border-color 0.2s ease;
+}
+
+.slds-input:focus, .slds-textarea:focus, .slds-combobox__input:focus {
+    border-color: #1589ee;
+    box-shadow: 0 0 0 3px rgba(21, 137, 238, 0.1);
+}
+
+/* Icon colors */
+.utility-home {
+    color: #0070d2;
+}
+
+.utility-connected_apps {
+    color: #00a651;
+}
+
+.utility-event {
+    color: #ff9500;
+}
+
+.utility-date_time {
+    color: #1589ee;
+}
+
+/* Custom styles for booking cards */
+.slds-card_expired {
+    opacity: 0.7;
+    border-left: 4px solid #706e6b;
+}
+
+.slds-card_disabled {
+    opacity: 0.5;
+    border-left: 4px solid #c23934;
+}
+
+/* Enhanced booking status styling */
+.booking-status-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Improved tab styling */
+.slds-tabs_default__link[aria-selected="true"] {
+    font-weight: bold;
+}
+
+/* Better spacing for booking cards */
+.booking-card-content {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .slds-large-size_1-of-2 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Tab content sections with margin bottom */
+.tab-content-section {
+    margin-bottom: 2rem;
+}
+
+/* Individual tab content containers */
+.rooms-tab-content,
+.equipment-tab-content,
+.bookings-tab-content {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+}
+
+/* Additional spacing for the main container */
+.main-container {
+    margin-bottom: 2rem;
+}
+
+/* Card containers with spacing */
+.booking-card-container {
+    margin-bottom: 1rem;
+}
+
+/* Override SLDS margins where needed */
+.custom-margin-bottom {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Modal spacing */
+.modal-content-spacing {
+    padding: 1rem;
+}
+
+/* Tab navigation spacing */
+.tab-navigation {
+    margin-bottom: 1rem;
+}
+
+/* Filter section spacing */
+.filter-section {
+    margin-bottom: 1.5rem;
+}
+
+/* Results section spacing */
+.results-section {
+    margin-bottom: 2rem;
+} 
