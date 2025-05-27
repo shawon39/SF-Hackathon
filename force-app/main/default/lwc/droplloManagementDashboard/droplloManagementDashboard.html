@@ -1,0 +1,421 @@
+<template>
+    <div class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-utility-chart" title="Dashboard">
+                        <lightning-icon icon-name="utility:chart" alternative-text="Dashboard" size="small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Management Dashboard</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex">
+                    <lightning-button-icon
+                        icon-name="utility:refresh"
+                        alternative-text="Refresh"
+                        title="Refresh"
+                        onclick={handleRefresh}
+                        disabled={isLoading}>
+                    </lightning-button-icon>
+                    <lightning-button-icon
+                        icon-name="utility:download"
+                        alternative-text="Export Data"
+                        title="Export Data"
+                        onclick={exportDashboardData}
+                        disabled={isLoading}
+                        class="slds-m-left_x-small">
+                    </lightning-button-icon>
+                </div>
+            </header>
+        </div>
+        
+        <div class="slds-card__body slds-card__body_inner">
+            <!-- Controls -->
+            <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-3">
+                    <lightning-combobox
+                        name="dateRange"
+                        label="Date Range"
+                        value={selectedDateRange}
+                        options={dateRangeOptions}
+                        onchange={handleDateRangeChange}>
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning-radio-group 
+                        name="tabs"
+                        label="View"
+                        options={tabOptions}
+                        value={selectedTab}
+                        type="button"
+                        onchange={handleTabChange}>
+                    </lightning-radio-group>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-text-align_center slds-m-vertical_large">
+                    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Overview Tab -->
+            <template if:true={isOverviewTab}>
+                <template if:false={isLoading}>
+                    <!-- Key Metrics -->
+                    <div class="slds-grid slds-gutters slds-m-bottom_large">
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{totalBookingsToday}</h3>
+                                <p class="slds-text-body_regular">Total Bookings Today</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{roomBookingsToday}</h3>
+                                <p class="slds-text-body_regular">Room Bookings</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{equipmentBookingsToday}</h3>
+                                <p class="slds-text-body_regular">Equipment Bookings</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large slds-text-color_error" if:true={overdueReturns}>{overdueReturns}</h3>
+                                <h3 class="slds-text-heading_large" if:false={overdueReturns}>0</h3>
+                                <p class="slds-text-body_regular">Overdue Returns</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Equipment Alert -->
+                    <template if:true={overdueEquipmentAlert.show}>
+                        <div class="slds-m-bottom_medium">
+                            <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                <span class="slds-assistive-text">Warning</span>
+                                <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Warning">
+                                    <lightning-icon icon-name="utility:warning" alternative-text="Warning" size="small" variant="warning"></lightning-icon>
+                                </span>
+                                <h2>{overdueEquipmentAlert.message}</h2>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Booking Trends Table -->
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Recent Booking Trends (Last 7 Days)</h3>
+                        <template if:true={bookingTrendsTable}>
+                            <template if:true={bookingTrendsTable.length}>
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Room Bookings</th>
+                                            <th scope="col">Equipment Bookings</th>
+                                            <th scope="col">Total Bookings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={bookingTrendsTable} for:item="trend">
+                                            <tr key={trend.dateLabel}>
+                                                <td>{trend.formattedDate}</td>
+                                                <td>{trend.roomBookings}</td>
+                                                <td>{trend.equipmentBookings}</td>
+                                                <td><strong>{trend.totalBookings}</strong></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template if:false={bookingTrendsTable.length}>
+                                <div class="slds-text-align_center slds-p-vertical_medium">
+                                    <p class="slds-text-body_regular">No booking trend data available.</p>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={bookingTrendsTable}>
+                            <div class="slds-text-align_center slds-p-vertical_medium">
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Trends Chart -->
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Booking Trends</h3>
+                        <div style="height: 300px;" class="slds-align_absolute-center">
+                            <div class="slds-text-align_center">
+                                <lightning-icon icon-name="utility:chart" size="large" class="slds-m-bottom_small"></lightning-icon>
+                                <p class="slds-text-heading_small">Chart Visualization</p>
+                                <p class="slds-text-body_regular">Chart.js library required for visual charts</p>
+                                <p class="slds-text-body_small">Data available through tables below</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popular Resources -->
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-box">
+                                <h3 class="slds-text-heading_small slds-m-bottom_small">Most Popular Room</h3>
+                                <p class="slds-text-body_regular">{mostPopularRoom}</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-box">
+                                <h3 class="slds-text-heading_small slds-m-bottom_small">Most Popular Equipment</h3>
+                                <p class="slds-text-body_regular">{mostPopularEquipment}</p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </template>
+
+            <!-- Room Analytics Tab -->
+            <template if:true={isRoomsTab}>
+                <template if:false={isLoading}>
+                    <!-- Room Summary Metrics -->
+                    <div class="slds-grid slds-gutters slds-m-bottom_large">
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{totalRoomsCount}</h3>
+                                <p class="slds-text-body_regular">Total Rooms</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{averageRoomUtilization}</h3>
+                                <p class="slds-text-body_regular">Average Utilization</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{roomUsageReport.totalBookings}</h3>
+                                <p class="slds-text-body_regular">Total Bookings</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{roomUsageReport.totalHoursBooked}</h3>
+                                <p class="slds-text-body_regular">Hours Booked</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Chart -->
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Room Utilization</h3>
+                        <div style="height: 400px;" class="slds-align_absolute-center">
+                            <div class="slds-text-align_center">
+                                <lightning-icon icon-name="utility:chart" size="large" class="slds-m-bottom_small"></lightning-icon>
+                                <p class="slds-text-heading_small">Room Utilization Chart</p>
+                                <p class="slds-text-body_regular">Chart.js library required for visual charts</p>
+                                <p class="slds-text-body_small">Data available in table below</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Rooms Table -->
+                    <div class="slds-box">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Top Performing Rooms</h3>
+                        <template if:true={topRooms}>
+                            <template if:true={topRooms.length}>
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col">Room Name</th>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Utilization %</th>
+                                            <th scope="col">Total Bookings</th>
+                                            <th scope="col">Hours Booked</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={topRooms} for:item="room">
+                                            <tr key={room.roomId}>
+                                                <td>{room.roomName}</td>
+                                                <td>{room.roomType}</td>
+                                                <td>{room.utilizationPercentage}%</td>
+                                                <td>{room.totalBookings}</td>
+                                                <td>{room.totalHoursBooked}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template if:false={topRooms.length}>
+                                <div class="slds-text-align_center slds-p-vertical_medium">
+                                    <p class="slds-text-body_regular">No room usage data available for the selected period.</p>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={topRooms}>
+                            <div class="slds-text-align_center slds-p-vertical_medium">
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+
+            <!-- Equipment Analytics Tab -->
+            <template if:true={isEquipmentTab}>
+                <template if:false={isLoading}>
+                    <!-- Equipment Summary Metrics -->
+                    <div class="slds-grid slds-gutters slds-m-bottom_large">
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{totalEquipmentCount}</h3>
+                                <p class="slds-text-body_regular">Total Equipment</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{equipmentUsageReport.totalBookings}</h3>
+                                <p class="slds-text-body_regular">Total Bookings</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{equipmentUsageReport.totalHoursBooked}</h3>
+                                <p class="slds-text-body_regular">Hours Booked</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{equipmentUsageReport.averageDuration}h</h3>
+                                <p class="slds-text-body_regular">Avg Duration</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Chart -->
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Equipment Usage Distribution</h3>
+                        <div style="height: 400px;" class="slds-align_absolute-center">
+                            <div class="slds-text-align_center">
+                                <lightning-icon icon-name="utility:chart" size="large" class="slds-m-bottom_small"></lightning-icon>
+                                <p class="slds-text-heading_small">Equipment Usage Chart</p>
+                                <p class="slds-text-body_regular">Chart.js library required for visual charts</p>
+                                <p class="slds-text-body_small">Data available in table below</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Equipment Table -->
+                    <div class="slds-box">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Most Used Equipment</h3>
+                        <template if:true={topEquipment}>
+                            <template if:true={topEquipment.length}>
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col">Equipment Name</th>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Total Bookings</th>
+                                            <th scope="col">Hours Booked</th>
+                                            <th scope="col">Avg Duration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={topEquipment} for:item="equipment">
+                                            <tr key={equipment.equipmentId}>
+                                                <td>{equipment.equipmentName}</td>
+                                                <td>{equipment.equipmentType}</td>
+                                                <td>{equipment.totalBookings}</td>
+                                                <td>{equipment.totalHoursBooked}</td>
+                                                <td>{equipment.averageBookingDuration}h</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template if:false={topEquipment.length}>
+                                <div class="slds-text-align_center slds-p-vertical_medium">
+                                    <p class="slds-text-body_regular">No equipment usage data available for the selected period.</p>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={topEquipment}>
+                            <div class="slds-text-align_center slds-p-vertical_medium">
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+
+            <!-- User Activity Tab -->
+            <template if:true={isUsersTab}>
+                <template if:false={isLoading}>
+                    <!-- User Activity Summary -->
+                    <div class="slds-grid slds-gutters slds-m-bottom_large">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{totalUsersCount}</h3>
+                                <p class="slds-text-body_regular">Active Users</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{userActivityReport.totalBookings}</h3>
+                                <p class="slds-text-body_regular">Total User Bookings</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-text-align_center">
+                                <h3 class="slds-text-heading_large">{userActivityReport.averageBookingsPerUser}</h3>
+                                <p class="slds-text-body_regular">Avg Bookings per User</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-box">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Top Active Users</h3>
+                        <template if:true={topUsers}>
+                            <template if:true={topUsers.length}>
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col">User Name</th>
+                                            <th scope="col">Total Bookings</th>
+                                            <th scope="col">Room Bookings</th>
+                                            <th scope="col">Equipment Bookings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={topUsers} for:item="user">
+                                            <tr key={user.userId}>
+                                                <td>{user.userName}</td>
+                                                <td>{user.totalBookings}</td>
+                                                <td>{user.roomBookings}</td>
+                                                <td>{user.equipmentBookings}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template if:false={topUsers.length}>
+                                <div class="slds-text-align_center slds-p-vertical_medium">
+                                    <p class="slds-text-body_regular">No user activity data available for the selected period.</p>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={topUsers}>
+                            <div class="slds-text-align_center slds-p-vertical_medium">
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </div>
+</template> 

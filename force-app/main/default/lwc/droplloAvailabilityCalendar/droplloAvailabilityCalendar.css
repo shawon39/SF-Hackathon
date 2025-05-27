@@ -1,0 +1,23 @@
+.booking-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.booking-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.booking-timeline {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.resource-card {
+    transition: all 0.2s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} 

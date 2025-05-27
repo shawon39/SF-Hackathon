@@ -12,13 +12,14 @@ public class DroplloScheduledSync implements Schedulable {
         System.debug('Starting scheduled sync of Dropillo resources...');
         
         try {
-            // Perform the sync
-            DroplloDataSyncService.SyncResult result = DroplloDataSyncService.syncAllResources();
+            // Perform the sync using the scheduled method
+            DroplloDataSyncService.SyncResult result = DroplloDataSyncService.syncAllResourcesScheduled();
             
             if (result.isSuccess) {
                 System.debug('Scheduled sync completed successfully');
                 System.debug('Rooms synced: ' + result.roomsSynced);
                 System.debug('Equipment synced: ' + result.equipmentSynced);
+                System.debug('API last updated: ' + result.apiLastUpdated);
                 
                 // Create sync log record
                 createSyncLog(result, true, null);
@@ -53,8 +54,17 @@ public class DroplloScheduledSync implements Schedulable {
             String description = 'Daily sync of Dropillo resources from external API\n';
             description += 'Sync Time: ' + DateTime.now() + '\n';
             description += 'Status: ' + (success ? 'SUCCESS' : 'FAILED') + '\n';
-            description += 'Rooms Synced: ' + result.roomsSynced + '\n';
-            description += 'Equipment Synced: ' + result.equipmentSynced + '\n';
+            description += 'Sync Type: ' + (result.syncType != null ? result.syncType : 'Daily_Sync') + '\n';
+            description += 'Rooms Synced: ' + (result.roomsSynced != null ? result.roomsSynced : 0) + '\n';
+            description += 'Equipment Synced: ' + (result.equipmentSynced != null ? result.equipmentSynced : 0) + '\n';
+            
+            if (result.apiLastUpdated != null) {
+                description += 'API Last Updated: ' + result.apiLastUpdated + '\n';
+            }
+            
+            if (result.getSyncDurationMs() != null) {
+                description += 'Sync Duration: ' + result.getSyncDurationMs() + ' ms\n';
+            }
             
             if (!success && String.isNotBlank(errorMessage)) {
                 description += 'Error: ' + errorMessage + '\n';
